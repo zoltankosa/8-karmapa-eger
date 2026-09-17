@@ -9,14 +9,14 @@ export const PROGRAM = [
   {
     day: 'sat',
     items: [
-      ['8:00', '8. Karmapa meditáció (1)', '8th Karmapa meditation (1)'],
+      ['8:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
       ['9:00', 'Reggeli', 'Breakfast'],
       ['10:00', '8. Karmapa meditáció magyarázata', 'Explanation of the 8th Karmapa meditation'],
-      ['', 'Utána 8. Karmapa meditáció (2)', 'Afterwards 8th Karmapa meditation (2)'],
+      ['', 'Utána 8. Karmapa meditáció', 'Afterwards 8th Karmapa meditation'],
       ['12:30', 'Ebéd', 'Lunch'],
-      ['14:00', '8. Karmapa meditáció (3)', '8th Karmapa meditation (3)'],
+      ['14:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
       ['15:00', 'Szünet', 'Break'],
-      ['16:00', '8. Karmapa meditáció (4)', '8th Karmapa meditation (4)'],
+      ['16:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
       ['17:00', 'Szünet', 'Break'],
       ['18:00', 'Vacsora', 'Dinner'],
       ['19:00', '16. Karmapa meditáció', '16th Karmapa meditation'],
@@ -26,9 +26,9 @@ export const PROGRAM = [
   {
     day: 'sun',
     items: [
-      ['8:00', '8. Karmapa meditáció (1)', '8th Karmapa meditation (1)'],
+      ['8:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
       ['9:00', 'Reggeli', 'Breakfast'],
-      ['10:00', '8. Karmapa meditáció (2)', '8th Karmapa meditation (2)'],
+      ['10:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
       ['13:00', 'Ebéd', 'Lunch'],
       ['15:00', 'Közös takarítás', 'Cleaning the house together'],
     ],
