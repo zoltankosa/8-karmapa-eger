@@ -28,7 +28,7 @@ export function t(key, ...args) {
 }
 
 // Always group thousands (hu-HU leaves 4-digit numbers ungrouped, which breaks column alignment).
-export const nf = { format: (n) => String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') };
+export const nf = { format: (n) => String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') };
 export const ft = (n) => `${nf.format(n)} Ft`;
 export const dayLabel = (d) => t('days')[d];
 export const itemLabel = (it) => t('kinds')[it.kind];

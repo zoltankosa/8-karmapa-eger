@@ -72,5 +72,5 @@ export function summarize(people) {
 }
 
 export function foldText(s) {
-  return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
