@@ -52,13 +52,10 @@ export const STRINGS = {
     nothingPicked: 'Nem jelöltél be étkezést vagy szállást.',
     seeProgram: 'Program megtekintése',
 
-    peopleIntro: 'Kik jönnek. A listából étkezést is választhatsz.',
-    filter: 'Ki jön erre?',
-    filterAll: 'Minden résztvevő',
-    peopleCount: (n) => `${n} fő`,
+    peopleIntro: 'Kik jönnek a hétvégére.',
+    peopleCount: (n) => `${n} résztvevő`,
     emptyTitle: 'Még nincs jelentkező',
     emptyBody: 'Az első jelentkezés a Jelentkezés oldalon adható le.',
-    noMatch: 'Erre még senki nem jelentkezett.',
 
     kitchenIntro: 'Hányan étkeznek naponta, étrend szerint. Az oldal magától frissül.',
     attendees: 'Résztvevők',
@@ -128,13 +125,10 @@ export const STRINGS = {
     nothingPicked: 'No meals or accommodation selected.',
     seeProgram: 'See the program',
 
-    peopleIntro: 'Who is coming. You can also pick a meal from the list.',
-    filter: 'Who is coming to',
-    filterAll: 'All attendees',
-    peopleCount: (n) => `${n} ${n === 1 ? 'person' : 'people'}`,
+    peopleIntro: 'Who is coming to the weekend.',
+    peopleCount: (n) => `${n} ${n === 1 ? 'attendee' : 'attendees'}`,
     emptyTitle: 'No registrations yet',
     emptyBody: 'The first one can be made on the Register page.',
-    noMatch: 'Nobody has registered for this yet.',
 
     kitchenIntro: 'How many people eat each day, split by diet. The page updates by itself.',
     attendees: 'Attendees',

@@ -33,7 +33,6 @@ export const nf = { format: (n) => String(Math.round(Number(n) || 0)).replace(/\
 export const ft = (n) => `${nf.format(n)} Ft`;
 export const dayLabel = (d) => t('days')[d];
 export const itemLabel = (it) => t('kinds')[it.kind];
-export const fullItemLabel = (it) => `${dayLabel(it.day)} ${itemLabel(it).toLowerCase()}`;
 export const timeStr = (d) =>
   d.toLocaleTimeString(lang === 'hu' ? 'hu-HU' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
 export const $ = (sel) => document.querySelector(sel);
