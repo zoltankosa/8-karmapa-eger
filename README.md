@@ -1,10 +1,13 @@
 # 8 Karmapa Eger
 
-Mobile-friendly registration page for the 8 Karmapa weekend, 25-27 September 2026.
+Mobile-first registration for the 8 Karmapa weekend, 25-27 September 2026. Separate pages:
 
-- **Résztvevők / Attendees:** register, edit or delete, filter by meal ("who is coming to Saturday lunch?"), search by name.
-- **Konyha / Kitchen:** portions per meal split into meat and vegetarian, name lists per meal, a shopping summary you can copy or print, and the money summary.
-- **Program:** the weekend schedule in Hungarian or English.
+- **`/` Jelentkezés / Register** (the link to share): name, diet, and a switch for each meal and night. No email. After saving, people see a summary and can edit or cancel from the same phone.
+- **`resztvevok.html` Résztvevők / Attendees:** who is coming, filter by meal ("who is coming to Saturday lunch?"), search by name. People can only edit or delete entries made on their own phone; organisers fix anything else in the Google Sheet.
+- **`konyha.html` Konyha / Kitchen:** portions per meal split into meat and vegetarian, name lists per meal, a shopping summary to copy or print, and the money summary.
+- **`program.html` Program:** the weekend schedule.
+
+Every page switches between Hungarian and English.
 
 Prices: dinner and lunch 1 800 Ft, breakfast 1 000 Ft, accommodation 2 000 Ft per night (Friday and Saturday).
 
