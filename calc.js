@@ -38,9 +38,16 @@ export function summarize(people) {
   for (const it of ITEMS) {
     items[it.id] = { ...it, count: 0, meat: 0, veg: 0, revenue: 0, names: { meat: [], veg: [] } };
   }
-  const out = { people: people.length, meat: 0, veg: 0, total: 0, food: 0, room: 0, portions: 0, items };
+  const days = Object.fromEntries(DAYS.map((d) => [d, { eating: 0, meat: 0, veg: 0 }]));
+  const out = { people: people.length, meat: 0, veg: 0, total: 0, food: 0, room: 0, portions: 0, items, days };
   for (const p of people) {
     out[p.diet] += 1;
+    for (const d of DAYS) {
+      if (ITEMS.some((it) => it.day === d && it.food && p.meals[it.id])) {
+        days[d].eating += 1;
+        days[d][p.diet] += 1;
+      }
+    }
     for (const it of ITEMS) {
       if (!p.meals[it.id]) continue;
       const s = items[it.id];

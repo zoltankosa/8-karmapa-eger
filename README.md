@@ -3,8 +3,8 @@
 Mobile-first registration for the 8 Karmapa weekend, 25-27 September 2026. Separate pages:
 
 - **`/` Jelentkezés / Register** (the link to share): name, diet, and a switch for each meal and night. No email. After saving, people see a summary and can edit or cancel from the same phone.
-- **`resztvevok.html` Résztvevők / Attendees:** who is coming, filter by meal ("who is coming to Saturday lunch?"), search by name. People can only edit or delete entries made on their own phone; organisers fix anything else in the Google Sheet.
-- **`konyha.html` Konyha / Kitchen:** portions per meal split into meat and vegetarian, name lists per meal, a shopping summary to copy or print, and the money summary.
+- **`resztvevok.html` Résztvevők / Attendees:** a plain list of names, with a dropdown to see who is coming to a given meal or night. No prices. People get an edit link only next to entries made on their own phone; organisers fix anything else in the Google Sheet.
+- **`konyha.html` Konyha / Kitchen:** total attendees, meat and vegetarian, then per day how many people eat (anyone with at least one meal that day), split into meat and vegetarian. No money, no names.
 - **`program.html` Program:** the weekend schedule.
 
 Every page switches between Hungarian and English.
@@ -39,4 +39,4 @@ No build step. Serve the folder with any static server, for example `python3 -m 
 npm test
 ```
 
-runs the price and summary calculations, and the Apps Script backend against an in-memory sheet.
+runs the price, per-day and summary calculations, and the Apps Script backend against an in-memory sheet.

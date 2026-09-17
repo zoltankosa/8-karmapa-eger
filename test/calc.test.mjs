@@ -34,6 +34,16 @@ test('summary totals and diet split', () => {
   assert.equal(s.portions, 10);
 });
 
+test('people eating per day (meals only, accommodation does not count)', () => {
+  const s = summarize(people);
+  assert.deepEqual(s.days.fri, { eating: 2, meat: 1, veg: 1 });
+  assert.deepEqual(s.days.sat, { eating: 2, meat: 1, veg: 1 });
+  assert.deepEqual(s.days.sun, { eating: 2, meat: 1, veg: 1 });
+  const onlyBreakfast = summarize([normalizePerson({ id: 'x', name: 'X', diet: 'veg', meals: { sat_breakfast: true, sat_dinner: true } })]);
+  assert.deepEqual(onlyBreakfast.days.sat, { eating: 1, meat: 0, veg: 1 });
+  assert.deepEqual(onlyBreakfast.days.fri, { eating: 0, meat: 0, veg: 0 });
+});
+
 test('empty list', () => {
   const s = summarize([]);
   assert.equal(s.total, 0);

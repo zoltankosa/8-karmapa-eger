@@ -1,4 +1,3 @@
-import { ITEMS } from './calc.js';
 import { STRINGS } from './i18n.js';
 
 const KEYS = { lang: 'kbc.lang', mine: 'kbc.mine' };
@@ -34,7 +33,6 @@ export const ft = (n) => `${nf.format(n)} Ft`;
 export const dayLabel = (d) => t('days')[d];
 export const itemLabel = (it) => t('kinds')[it.kind];
 export const fullItemLabel = (it) => `${dayLabel(it.day)} ${itemLabel(it).toLowerCase()}`;
-export const itemById = Object.fromEntries(ITEMS.map((it) => [it.id, it]));
 export const timeStr = (d) =>
   d.toLocaleTimeString(lang === 'hu' ? 'hu-HU' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
 export const $ = (sel) => document.querySelector(sel);
@@ -58,9 +56,6 @@ export function h(tag, props = {}, ...children) {
 }
 
 const ICONS = {
-  chevron: 'm6 9 6 6 6-6',
-  copy: 'M9 9h10v12H9zM5 15V3h10',
-  print: 'M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2M7 14h10v7H7z',
   edit: 'M4 20h4L19 9l-4-4L4 16v4ZM13.5 6.5l4 4',
   trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3',
   check: 'm5 12.5 4.5 4.5L19 7.5',
@@ -77,17 +72,6 @@ export function icon(name, cls = 'icon') {
   path.setAttribute('d', ICONS[name]);
   svg.append(path);
   return svg;
-}
-
-export function disclosure(openSet, key, summaryChildren, bodyChildren, cls = '') {
-  const d = h('details', { class: `disclosure ${cls}`, open: openSet.has(key) },
-    h('summary', {}, h('span', { class: 'summary-main' }, summaryChildren), icon('chevron', 'icon chevron')),
-    h('div', { class: 'disclosure-body' }, bodyChildren));
-  d.addEventListener('toggle', () => {
-    if (d.open) openSet.add(key);
-    else openSet.delete(key);
-  });
-  return d;
 }
 
 let toastTimer;
