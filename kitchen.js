@@ -1,7 +1,7 @@
-import { DAYS, normalizePerson, summarize } from './calc.js?v=202609171215';
-import { API_URL } from './config.js?v=202609171215';
-import { createStore } from './store.js?v=202609171215';
-import { $, dayLabel, h, initShell, liveSync, nf, t, toast } from './ui.js?v=202609171215';
+import { DAYS, ITEMS, normalizePerson, summarize } from './calc.js?v=202609171220';
+import { API_URL } from './config.js?v=202609171220';
+import { createStore } from './store.js?v=202609171220';
+import { $, dayLabel, h, initShell, itemLabel, liveSync, nf, t, toast } from './ui.js?v=202609171220';
 
 const store = createStore(API_URL);
 const state = { people: null };
@@ -34,16 +34,21 @@ function update() {
 
   $('#kitchenDays').replaceChildren(
     h('p', { class: 'eyebrow', text: t('perDay') }),
-    ...DAYS.map((d) => {
-      const s = sum.days[d];
-      return h('article', { class: 'day-card' },
+    ...DAYS.map((d) =>
+      h('article', { class: 'day-card' },
         h('div', { class: 'day-card-head' },
           h('h2', {}, dayLabel(d), h('span', { class: 'muted', text: t('dayDates')[d] }))),
-        h('div', { class: 'stats' },
-          stat(t('persons'), s.eating, 'stat-main'),
-          stat(t('meat'), s.meat),
-          stat(t('veg'), s.veg, 'stat-veg')));
-    }));
+        ITEMS.filter((it) => it.day === d).map((it) => {
+          const s = sum.items[it.id];
+          return h('section', { class: 'meal-row' },
+            h('h3', { class: 'meal-title', text: itemLabel(it) }),
+            it.food
+              ? h('div', { class: 'stats' },
+                  stat(t('persons'), s.count, 'stat-main'),
+                  stat(t('meat'), s.meat),
+                  stat(t('veg'), s.veg, 'stat-veg'))
+              : h('div', { class: 'stats' }, stat(t('sleeping'), s.count, 'stat-main')));
+        }))));
 }
 
 initShell('kitchen', mount, store);

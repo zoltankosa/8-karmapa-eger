@@ -57,10 +57,11 @@ export const STRINGS = {
     emptyTitle: 'Még nincs jelentkező',
     emptyBody: 'Az első jelentkezés a Jelentkezés oldalon adható le.',
 
-    kitchenIntro: 'Hányan étkeznek naponta, étrend szerint. Az oldal magától frissül.',
+    kitchenIntro: 'Hányan étkeznek étkezésenként, étrend szerint, és hányan alszanak itt. Az oldal magától frissül.',
     attendees: 'Résztvevők',
     perDay: 'Naponta',
     persons: 'fő étkezik',
+    sleeping: 'fő alszik itt',
 
     programIntro: 'A hétvége napirendje.',
 
@@ -130,10 +131,11 @@ export const STRINGS = {
     emptyTitle: 'No registrations yet',
     emptyBody: 'The first one can be made on the Register page.',
 
-    kitchenIntro: 'How many people eat each day, split by diet. The page updates by itself.',
+    kitchenIntro: 'How many people eat at each meal, split by diet, and how many sleep here. The page updates by itself.',
     attendees: 'Attendees',
     perDay: 'Per day',
     persons: 'eating',
+    sleeping: 'sleeping here',
 
     programIntro: 'The schedule of the weekend.',
 
