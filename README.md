@@ -15,7 +15,7 @@ The page checks for changes every 10 seconds and whenever it comes back into vie
 
 ## How the shared data works
 
-GitHub Pages only serves static files, so the registrations live in a Google Sheet owned by the organiser. A small Google Apps Script (`apps-script/Code.gs`) reads and writes that sheet. Until it is connected, the page runs in demo mode and keeps data on the visitor's own device.
+GitHub Pages only serves static files, so the registrations live in a Google Sheet owned by the organiser. A small Google Apps Script (`apps-script/Code.gs`) reads and writes that sheet. It is connected (`config.js` holds the web app URL); with an empty `API_URL` the page falls back to demo mode and keeps data on the visitor's own device.
 
 ### Connecting the Google Sheet (one time, about 5 minutes)
 

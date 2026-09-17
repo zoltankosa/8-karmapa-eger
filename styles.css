@@ -160,7 +160,12 @@ select.input {
 .btn:active { transform: scale(0.98); }
 .btn .icon { width: 18px; height: 18px; }
 .btn-primary { background: var(--ink); color: var(--ink-text); }
-.btn-primary:disabled { opacity: 0.55; cursor: progress; }
+.btn-primary:disabled { opacity: 0.75; cursor: progress; }
+.btn-primary:disabled::before {
+  content: ""; width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid currentColor; border-right-color: transparent; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 .btn-ghost { border-color: var(--line-strong); background: var(--surface); }
 .btn-danger { background: var(--danger); color: #fff; }
 .btn-block { width: 100%; }

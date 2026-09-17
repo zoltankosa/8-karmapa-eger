@@ -24,7 +24,7 @@ export const STRINGS = {
     total: 'Összesen',
     submit: 'Jelentkezem',
     saveChanges: 'Módosítás mentése',
-    saving: 'Mentés',
+    saving: 'Mentés folyamatban',
     cancel: 'Mégse',
     del: 'Törlés',
     edit: 'Módosítás',
