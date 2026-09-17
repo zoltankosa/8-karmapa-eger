@@ -1,7 +1,9 @@
 import { DAYS, ITEMS, foldText, normalizePerson, personTotal } from './calc.js';
 import { API_URL } from './config.js';
 import { createStore } from './store.js';
-import { $, confirmDialog, dayLabel, ft, h, icon, initShell, itemLabel, mine, t, toast } from './ui.js';
+import {
+  $, cache, confirmDialog, dayLabel, ft, h, icon, initShell, itemLabel, mine, newId, outbox, overlay, t,
+} from './ui.js';
 
 const store = createStore(API_URL);
 const editId = new URLSearchParams(location.search).get('edit') || '';
@@ -14,7 +16,6 @@ const view = {
   people: null,
   saved: null,
   wasEdit: false,
-  busy: false,
   nameError: false,
 };
 
@@ -67,7 +68,7 @@ function yourRegistrations() {
     h('ul', { class: 'yours-list' },
       entries.map(([id, name]) =>
         h('li', {},
-          h('span', { text: name }),
+          h('span', {}, name, outbox.isPending(id) ? h('span', { class: 'tag tag-pending', text: t('pendingTag') }) : null),
           h('a', { class: 'link', href: editLink(id) }, t('edit'), icon('arrow', 'icon icon-sm'))))));
 }
 
@@ -164,7 +165,7 @@ function formView() {
     h('div', { class: 'submitbar' },
       h('div', { class: 'submitbar-inner' },
         h('p', { class: 'total' }, h('span', { class: 'total-label', text: t('total') }), totalEl),
-        h('button', { class: 'btn btn-primary btn-wide', type: 'submit', disabled: view.busy, text: view.busy ? t('saving') : submitLabel }))));
+        h('button', { class: 'btn btn-primary btn-wide', type: 'submit', text: submitLabel }))));
 
   return h('div', { class: 'register' },
     h('header', { class: 'page-head' },
@@ -189,6 +190,7 @@ function doneView() {
     h('div', { class: 'done-badge' }, icon('check', 'icon icon-xl')),
     h('h1', { text: view.wasEdit ? t('updatedTitle') : t('doneTitle', p.name) }),
     h('p', { class: 'lead', text: t('doneBody') }),
+    h('div', { id: 'saveStatus', class: 'save-status', 'aria-live': 'polite' }, saveStatus(p.id)),
     h('div', { class: 'receipt' },
       h('div', { class: 'receipt-head' },
         h('span', { class: 'receipt-name', text: p.name }),
@@ -202,9 +204,21 @@ function doneView() {
       h('a', { class: 'link center', href: 'program.html' }, t('seeProgram'), icon('arrow', 'icon icon-sm'))));
 }
 
-async function onSubmit(e) {
+function saveStatus(id) {
+  if (!outbox.isPending(id)) {
+    return [h('span', { class: 'save-ok' }, icon('check', 'icon icon-sm'), t('savedStatus'))];
+  }
+  if (outbox.failing) {
+    return [
+      h('span', { class: 'save-wait' }, t('retrying')),
+      h('button', { class: 'link-btn', type: 'button', text: t('retry'), onclick: () => outbox.flush() }),
+    ];
+  }
+  return [h('span', { class: 'save-wait' }, h('span', { class: 'spinner', 'aria-hidden': 'true' }), t('savingStatus'))];
+}
+
+function onSubmit(e) {
   e.preventDefault();
-  if (view.busy) return;
   const d = view.draft;
   const name = d.name.replace(/\s+/g, ' ').trim();
   if (!name) {
@@ -215,66 +229,69 @@ async function onSubmit(e) {
     input.focus();
     return;
   }
-  if (!d.id && view.people?.some((p) => foldText(p.name) === foldText(name))) {
-    if (!(await confirmDialog(t('dupName', name), t('addAnyway')))) return;
-  }
-  view.busy = true;
-  render();
-  try {
-    const res = await store.save({ id: d.id, name, diet: d.diet, meals: { ...d.meals } });
-    const id = d.id || res.id;
-    mine.set(id, name);
-    view.people = res.people;
+  const finish = () => {
+    const person = { id: d.id || newId(), name, diet: d.diet, meals: { ...d.meals } };
+    mine.set(person.id, name);
+    outbox.add({ type: 'save', person });
+    view.people = overlay(cache.get() || []);
     view.wasEdit = Boolean(d.id);
-    view.saved = normalizePerson({ ...d, id, name });
+    view.saved = normalizePerson(person);
     view.draft = emptyDraft();
     history.replaceState(null, '', './');
-    view.busy = false;
     setMode('done');
-  } catch (err) {
-    console.error(err);
-    view.busy = false;
-    render();
-    toast(t('saveError'), 'error');
-  }
+  };
+  const dup = !d.id && view.people?.some((p) => foldText(p.name) === foldText(name));
+  if (!dup) return finish();
+  confirmDialog(t('dupName', name), t('addAnyway')).then((ok) => { if (ok) finish(); });
 }
 
 async function onDelete() {
   const d = view.draft;
   if (!(await confirmDialog(t('confirmDelete', d.name), t('del')))) return;
-  try {
-    await store.remove(d.id);
-    mine.remove(d.id);
-    view.draft = emptyDraft();
-    history.replaceState(null, '', './');
-    setMode('deleted');
-  } catch (err) {
-    console.error(err);
-    toast(t('deleteError'), 'error');
-  }
+  outbox.add({ type: 'delete', id: d.id });
+  mine.remove(d.id);
+  view.people = overlay(cache.get() || []);
+  view.draft = emptyDraft();
+  history.replaceState(null, '', './');
+  setMode('deleted');
 }
 
-async function load() {
-  try {
-    const res = await store.list();
-    view.people = res.people || [];
-  } catch (err) {
-    console.error(err);
-    if (editId) toast(t('loadError'), 'error');
-  }
-  if (!editId) return;
-  const found = view.people?.find((p) => p.id === editId);
+function useList(list, final) {
+  view.people = list;
+  if (!editId || view.mode !== 'loading') return;
+  const found = list?.find((p) => p.id === editId);
   if (found) {
     const p = normalizePerson(found);
     view.draft = { id: p.id, name: p.name, diet: p.diet, meals: { ...p.meals } };
     setMode('form');
-  } else if (view.people) {
+  } else if (final && list) {
     mine.remove(editId);
     setMode('notfound');
-  } else {
+  } else if (final) {
     setMode('loaderror');
   }
 }
 
+async function load() {
+  const cached = cache.get();
+  if (cached) useList(overlay(cached), false);
+  try {
+    const res = await store.list();
+    cache.set(res.people || []);
+    useList(overlay(res.people || []), true);
+  } catch (err) {
+    console.error(err);
+    useList(cached ? overlay(cached) : null, true);
+  }
+}
+
+outbox.onChange(() => {
+  const box = $('#saveStatus');
+  if (box && view.saved) box.replaceChildren(...saveStatus(view.saved.id));
+  const yours = $('.yours');
+  if (yours && view.mode === 'form') yours.replaceWith(yourRegistrations() || '');
+});
+
 initShell('register', render, store);
+outbox.attach(store);
 load();

@@ -1,5 +1,7 @@
+import { API_URL } from './config.js';
 import { PROGRAM } from './program.js';
-import { $, dayLabel, getLang, h, initShell, t } from './ui.js';
+import { createStore } from './store.js';
+import { $, dayLabel, getLang, h, initShell, outbox, t } from './ui.js';
 
 function mount() {
   const col = getLang() === 'hu' ? 1 : 2;
@@ -17,3 +19,4 @@ function mount() {
 }
 
 initShell('program', mount, null);
+outbox.attach(createStore(API_URL));

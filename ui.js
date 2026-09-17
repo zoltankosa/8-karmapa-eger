@@ -1,7 +1,8 @@
 import { STRINGS } from './i18n.js';
 
-const KEYS = { lang: 'kbc.lang', mine: 'kbc.mine' };
+const KEYS = { lang: 'kbc.lang', mine: 'kbc.mine', cache: 'kbc.cache', outbox: 'kbc.outbox' };
 const POLL_MS = 10000;
+const RETRY_MS = 8000;
 
 export function readLS(key, fallback) {
   try {
@@ -154,7 +155,92 @@ export function initShell(page, render, store) {
   return draw;
 }
 
-// Polls the store while the page is visible and reports changes to onChange(people).
+// Last list received from the server, so pages can render instantly on the next visit.
+export const cache = {
+  get: () => readLS(KEYS.cache, null),
+  set: (people) => writeLS(KEYS.cache, people),
+};
+
+export const newId = () =>
+  globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 14)}`;
+
+const opKey = (op) => (op.type === 'save' ? op.person.id : op.id);
+
+// Saves and deletes are queued on the phone and sent in the background, so the UI never waits
+// on the (slow) backend. The queue survives reloads and retries until the server confirms.
+export const outbox = (() => {
+  let store = null;
+  let running = false;
+  let failing = false;
+  let timer = null;
+  const listeners = new Set();
+  const read = () => readLS(KEYS.outbox, []);
+  const write = (q) => writeLS(KEYS.outbox, q);
+  const emit = () => listeners.forEach((fn) => fn());
+  const api = {
+    attach(s) {
+      store = s;
+      window.addEventListener('online', () => api.flush());
+      api.flush();
+    },
+    onChange: (fn) => listeners.add(fn),
+    all: read,
+    isPending: (id) => read().some((op) => opKey(op) === id),
+    get failing() { return failing; },
+    add(op) {
+      const entry = { ...op, seq: newId() };
+      write([...read().filter((o) => opKey(o) !== opKey(entry)), entry]);
+      emit();
+      api.flush();
+    },
+    async flush() {
+      if (running || !store) return;
+      running = true;
+      clearTimeout(timer);
+      try {
+        for (let q = read(); q.length; q = read()) {
+          const op = q[0];
+          const res = op.type === 'save' ? await store.save(op.person) : await store.remove(op.id);
+          write(read().filter((o) => o.seq !== op.seq));
+          if (res?.people) cache.set(res.people);
+          failing = false;
+          emit();
+        }
+      } catch (err) {
+        console.error(err);
+        failing = true;
+        emit();
+        timer = setTimeout(() => api.flush(), RETRY_MS);
+      } finally {
+        running = false;
+      }
+    },
+  };
+  // Leaving the page must not lose a queued save: hand it to the browser to finish in the background.
+  // The queue stays too, and saves/deletes are idempotent, so a later resend is harmless.
+  window.addEventListener('pagehide', () => {
+    if (store?.beacon) read().forEach((op) => store.beacon(op));
+  });
+  return api;
+})();
+
+// Server list with this phone's unsent changes applied on top.
+export function overlay(people) {
+  let list = [...(people || [])];
+  for (const op of outbox.all()) {
+    if (op.type === 'save') {
+      const i = list.findIndex((p) => p.id === op.person.id);
+      if (i >= 0) list[i] = op.person;
+      else list.push(op.person);
+    } else {
+      list = list.filter((p) => p.id !== op.id);
+    }
+  }
+  return list;
+}
+
+// Shows the cached list at once, then polls the store while the page is visible and reports
+// changes to onChange(people). onChange(null) means the first load failed with nothing cached.
 export function liveSync(store, onChange) {
   const btn = $('#statusBtn');
   const s = { status: 'syncing', lastSync: null, sig: null, inflight: false, loaded: false };
@@ -170,15 +256,21 @@ export function liveSync(store, onChange) {
     btn.setAttribute('aria-label', s.lastSync ? `${t('updatedAt', timeStr(s.lastSync))}. ${t('refresh')}` : t('refresh'));
   };
 
+  const show = (people) => {
+    const view = overlay(people);
+    const sig = JSON.stringify(view);
+    if (sig !== s.sig) {
+      s.sig = sig;
+      onChange(view);
+    }
+  };
+
   const apply = (people) => {
-    const sig = JSON.stringify(people);
+    cache.set(people);
     s.lastSync = new Date();
     s.status = 'ok';
     s.loaded = true;
-    if (sig !== s.sig) {
-      s.sig = sig;
-      onChange(people);
-    }
+    show(people);
     paint();
   };
 
@@ -197,10 +289,15 @@ export function liveSync(store, onChange) {
       paint();
       if (!s.loaded) {
         s.loaded = true;
-        onChange(null);
+        if (cache.get() === null) onChange(null);
       }
     }
   };
+
+  const cached = cache.get();
+  if (cached) show(cached);
+  outbox.onChange(() => show(cache.get() || []));
+  outbox.attach(store);
 
   btn.addEventListener('click', refresh);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refresh(); });

@@ -161,10 +161,6 @@ select.input {
 .btn .icon { width: 18px; height: 18px; }
 .btn-primary { background: var(--ink); color: var(--ink-text); }
 .btn-primary:disabled { opacity: 0.75; cursor: progress; }
-.btn-primary:disabled::before {
-  content: ""; width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid currentColor; border-right-color: transparent; animation: spin 0.8s linear infinite;
-}
 @keyframes spin { to { transform: rotate(360deg); } }
 .btn-ghost { border-color: var(--line-strong); background: var(--surface); }
 .btn-danger { background: var(--danger); color: #fff; }
@@ -235,6 +231,11 @@ select.input {
 .done h1 { font-size: 30px; line-height: 1.15; letter-spacing: -0.02em; font-weight: 750; }
 .done .lead { margin-top: 0; }
 .done-lead { font-size: 18px; font-weight: 600; }
+.save-status { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 14px; font-weight: 600; min-height: 24px; }
+.save-ok { display: inline-flex; align-items: center; gap: 6px; color: var(--veg); }
+.save-wait { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); }
+.spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin 0.8s linear infinite; }
+.tag-pending { margin-left: 8px; }
 .done-badge {
   width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
   background: var(--ink); color: var(--ink-text); animation: pop 0.35s ease-out;

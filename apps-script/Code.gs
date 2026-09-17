@@ -1,7 +1,7 @@
 /**
  * 8. Karmapa Eger: shared registration backend.
  * Paste into Extensions > Apps Script of the Google Sheet, then Deploy > New deployment > Web app
- * (Execute as: Me, Who has access: Anyone).
+ * (Execute as: Me, Who has access: Anyone). After changes: Manage deployments > Edit > New version.
  */
 var SHEET_NAME = 'Jelentkezések';
 var ITEMS = [
@@ -18,14 +18,24 @@ var HEADERS = ['ID', 'Név', 'Étrend']
   .concat(ITEMS.map(function (it) { return it[1]; }))
   .concat(['Összesen', 'Módosítva']);
 var COL_MEALS = 3;
-var COL_UPDATED = COL_MEALS + ITEMS.length + 1;
+var COL_TOTAL = COL_MEALS + ITEMS.length;
+var COL_UPDATED = COL_TOTAL + 1;
 var MAX_PEOPLE = 400;
 var DIET_VEG = 'vegetáriánus';
 var DIET_MEAT = 'húsos';
+var LAYOUT_VERSION = '2';
+var CACHE_KEY = 'people';
+// Hand edits in the sheet show up on the site within this many seconds.
+var CACHE_SECONDS = 20;
 
 function doGet() {
   return respond_(function () {
-    return { people: readPeople_() };
+    var cache = CacheService.getScriptCache();
+    var hit = cache.get(CACHE_KEY);
+    if (hit) return { people: JSON.parse(hit) };
+    var people = toPeople_(sheet_().getDataRange().getValues());
+    putCache_(people);
+    return { people: people };
   });
 }
 
@@ -35,16 +45,18 @@ function doPost(e) {
     var lock = LockService.getScriptLock();
     lock.waitLock(20000);
     try {
+      var sh = sheet_();
+      var values = sh.getDataRange().getValues();
       var result = {};
       if (body.action === 'save') {
-        result.id = savePerson_(body.person || {});
+        result.id = savePerson_(sh, values, body.person || {});
       } else if (body.action === 'delete') {
-        deletePerson_(String(body.id || ''));
+        deletePerson_(sh, values, String(body.id || ''));
       } else {
         throw new Error('Unknown action');
       }
-      SpreadsheetApp.flush();
-      result.people = readPeople_();
+      result.people = toPeople_(values);
+      putCache_(result.people);
       return result;
     } finally {
       lock.releaseLock();
@@ -63,12 +75,27 @@ function respond_(fn) {
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
 }
 
+function putCache_(people) {
+  try {
+    CacheService.getScriptCache().put(CACHE_KEY, JSON.stringify(people), CACHE_SECONDS);
+  } catch (err) {
+    // Too large for the cache: readers fall back to the sheet.
+  }
+}
+
+// Column formats are set once, not on every save.
 function sheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
-  if (sh.getLastRow() === 0) {
+  var props = PropertiesService.getScriptProperties();
+  if (props.getProperty('layout') !== LAYOUT_VERSION || sh.getLastRow() === 0) {
+    var rows = sh.getMaxRows();
     sh.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]).setFontWeight('bold');
     sh.setFrozenRows(1);
+    sh.getRange(1, 1, rows, COL_MEALS).setNumberFormat('@');
+    sh.getRange(1, COL_MEALS + 1, rows, ITEMS.length + 1).setNumberFormat('#,##0" Ft";;""');
+    sh.getRange(1, COL_UPDATED + 1, rows, 1).setNumberFormat('yyyy-mm-dd hh:mm');
+    props.setProperty('layout', LAYOUT_VERSION);
   }
   return sh;
 }
@@ -79,32 +106,29 @@ function isTicked_(v) {
   return s !== '' && s !== '0' && s !== 'false' && s !== 'nem';
 }
 
-function readPeople_() {
-  var sh = sheet_();
-  var n = sh.getLastRow() - 1;
-  if (n < 1) return [];
-  var values = sh.getRange(2, 1, n, HEADERS.length).getValues();
+function toPeople_(values) {
   var people = [];
-  values.forEach(function (r) {
-    if (String(r[0]).trim() === '' || String(r[1]).trim() === '') return;
+  for (var i = 1; i < values.length; i++) {
+    var r = values[i];
+    if (String(r[0]).trim() === '' || String(r[1]).trim() === '') continue;
     var meals = {};
-    ITEMS.forEach(function (it, i) { meals[it[0]] = isTicked_(r[COL_MEALS + i]); });
+    for (var j = 0; j < ITEMS.length; j++) meals[ITEMS[j][0]] = isTicked_(r[COL_MEALS + j]);
     var updated = r[COL_UPDATED];
     people.push({
       id: String(r[0]),
       name: String(r[1]),
       diet: String(r[2]).trim().toLowerCase().indexOf('veg') === 0 ? 'veg' : 'meat',
       meals: meals,
-      updatedAt: updated instanceof Date ? updated.toISOString() : String(updated)
+      updatedAt: updated instanceof Date ? updated.toISOString() : String(updated || '')
     });
-  });
+  }
   return people;
 }
 
-// Leading = + - @ would turn a name into a spreadsheet formula.
+// Control characters become spaces; leading = + - @ would turn a name into a formula.
 function cleanName_(v) {
   return String(v || '')
-    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .replace(/[\x00-\x1f\x7f]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/^[=+\-@]+/, '')
@@ -112,40 +136,37 @@ function cleanName_(v) {
     .slice(0, 80);
 }
 
-function findRow_(sh, id) {
-  var n = sh.getLastRow() - 1;
-  if (n < 1 || !id) return -1;
-  var ids = sh.getRange(2, 1, n, 1).getValues();
-  for (var i = 0; i < ids.length; i++) {
-    if (String(ids[i][0]) === id) return i + 2;
+function findIndex_(values, id) {
+  if (!id) return -1;
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][0]) === id) return i;
   }
   return -1;
 }
 
-function savePerson_(p) {
+function savePerson_(sh, values, p) {
   var name = cleanName_(p.name);
   if (!name) throw new Error('Name is required');
-  var sh = sheet_();
   var id = /^[A-Za-z0-9-]{8,64}$/.test(String(p.id || '')) ? String(p.id) : '';
-  var row = findRow_(sh, id);
-  if (row < 0) {
-    if (sh.getLastRow() - 1 >= MAX_PEOPLE) throw new Error('Registration limit reached');
+  var idx = findIndex_(values, id);
+  if (idx < 0) {
+    if (values.length - 1 >= MAX_PEOPLE) throw new Error('Registration limit reached');
     id = id || Utilities.getUuid();
-    row = sh.getLastRow() + 1;
+    idx = values.length;
   }
   var meals = p.meals || {};
   var cells = ITEMS.map(function (it) { return meals[it[0]] === true ? it[2] : ''; });
   var total = cells.reduce(function (s, v) { return s + (Number(v) || 0); }, 0);
-  sh.getRange(row, 1, 1, COL_MEALS).setNumberFormat('@')
-    .setValues([[id, name, p.diet === 'veg' ? DIET_VEG : DIET_MEAT]]);
-  sh.getRange(row, COL_MEALS + 1, 1, ITEMS.length + 1).setNumberFormat('#,##0" Ft";;""')
-    .setValues([cells.concat([total])]);
-  sh.getRange(row, COL_UPDATED + 1).setNumberFormat('yyyy-mm-dd hh:mm').setValue(new Date());
+  var record = [id, name, p.diet === 'veg' ? DIET_VEG : DIET_MEAT].concat(cells, [total, new Date()]);
+  sh.getRange(idx + 1, 1, 1, HEADERS.length).setValues([record]);
+  values[idx] = record;
   return id;
 }
 
-function deletePerson_(id) {
-  var sh = sheet_();
-  var row = findRow_(sh, id);
-  if (row > 0) sh.deleteRow(row);
+function deletePerson_(sh, values, id) {
+  var idx = findIndex_(values, id);
+  if (idx > 0) {
+    sh.deleteRow(idx + 1);
+    values.splice(idx, 1);
+  }
 }

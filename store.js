@@ -37,6 +37,20 @@ function remoteStore(url) {
       const data = await post({ action: 'delete', id });
       return { people: data.people };
     },
+    beacon(op) {
+      const payload = op.type === 'save' ? { action: 'save', person: op.person } : { action: 'delete', id: op.id };
+      try {
+        fetch(url, {
+          method: 'POST',
+          mode: 'no-cors',
+          keepalive: true,
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        /* the queued copy will be sent on the next visit */
+      }
+    },
   };
 }
 

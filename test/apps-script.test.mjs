@@ -10,6 +10,11 @@ function fakeSheet() {
   const sheet = {
     rows,
     getLastRow: () => rows.length,
+    getMaxRows: () => 1000,
+    getDataRange() {
+      const width = Math.max(1, ...rows.map((r) => r.length));
+      return sheet.getRange(1, 1, Math.max(1, rows.length), width);
+    },
     setFrozenRows: (n) => { frozen = n; },
     get frozen() { return frozen; },
     deleteRow: (r) => rows.splice(r - 1, 1),
@@ -43,7 +48,11 @@ function fakeSheet() {
 function loadScript() {
   const sheet = fakeSheet();
   let uuid = 0;
+  const props = new Map();
+  const cacheStore = new Map();
   const ctx = {
+    PropertiesService: { getScriptProperties: () => ({ getProperty: (k) => props.get(k) ?? null, setProperty: (k, v) => props.set(k, v) }) },
+    CacheService: { getScriptCache: () => ({ get: (k) => cacheStore.get(k) ?? null, put: (k, v) => cacheStore.set(k, v) }) },
     SpreadsheetApp: {
       getActiveSpreadsheet: () => ({ getSheetByName: () => sheet, insertSheet: () => sheet }),
       flush: () => {},
@@ -58,7 +67,7 @@ function loadScript() {
   vm.createContext(ctx);
   vm.runInContext(readFileSync(new URL('../apps-script/Code.gs', import.meta.url), 'utf8'), ctx);
   const call = (method, body) => JSON.parse(ctx[method](body ? { postData: { contents: JSON.stringify(body) } } : {}).text);
-  return { sheet, call };
+  return { sheet, call, cacheStore };
 }
 
 test('create, list, edit, delete', () => {
@@ -102,13 +111,25 @@ test('rejects bad input and neutralises formulas', () => {
 });
 
 test('hand-edited sheet rows are read tolerantly', () => {
-  const { sheet, call } = loadScript();
+  const { sheet, call, cacheStore } = loadScript();
   call('doGet');
   sheet.rows.push(['manual-1', 'Kézi Péter', 'Vegetarian', 'x', '', 0, '1800', 'nem', '', '', '']);
+  cacheStore.clear();
   const people = call('doGet').people;
   assert.equal(people[0].diet, 'veg');
   assert.equal(people[0].meals.fri_dinner, true);
   assert.equal(people[0].meals.sat_breakfast, false);
   assert.equal(people[0].meals.sat_lunch, true);
   assert.equal(people[0].meals.sat_dinner, false);
+});
+
+test('keeps a client-generated id and serves reads from the cache after a write', () => {
+  const { sheet, call } = loadScript();
+  const id = '3f1c2a9e-1111-4222-8333-444455556666';
+  const res = call('doPost', { action: 'save', person: { id, name: 'Kliens Id', meals: { sat_lunch: true } } });
+  assert.equal(res.id, id);
+  sheet.rows[1][1] = 'Changed Behind Cache';
+  assert.equal(call('doGet').people[0].name, 'Kliens Id', 'cached copy is served');
+  const again = call('doPost', { action: 'save', person: { id, name: 'Kliens Id', meals: {} } });
+  assert.equal(again.people.length, 1, 'same id updates, never duplicates');
 });
