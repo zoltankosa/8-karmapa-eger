@@ -2,7 +2,7 @@ export const STRINGS = {
   hu: {
     htmlLang: 'hu',
     title: '8 Karmapa Eger',
-    place: 'Marpa Ház, Becske',
+    place: 'Eger, Grónay Sándor utca 8.',
     dates: '2026. szeptember 25-27.',
     switchLang: 'EN',
     switchLangLabel: 'Switch to English',
@@ -101,7 +101,7 @@ export const STRINGS = {
   en: {
     htmlLang: 'en',
     title: '8 Karmapa Eger',
-    place: 'Marpa House, Becske',
+    place: 'Eger, Grónay Sándor utca 8.',
     dates: '25-27 September 2026',
     switchLang: 'HU',
     switchLangLabel: 'Váltás magyarra',

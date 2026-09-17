@@ -30,7 +30,7 @@ export const PROGRAM = [
       ['9:00', 'Reggeli', 'Breakfast'],
       ['10:00', '8. Karmapa meditáció (2)', '8th Karmapa meditation (2)'],
       ['13:00', 'Ebéd', 'Lunch'],
-      ['15:00', 'Közös takarítás', 'Cleaning the Marpa house together'],
+      ['15:00', 'Közös takarítás', 'Cleaning the house together'],
     ],
   },
 ];
