@@ -89,7 +89,7 @@ a { color: inherit; }
 }
 .brand { display: grid; min-width: 0; text-decoration: none; }
 .brand-title { font-weight: 750; font-size: 17px; letter-spacing: -0.01em; line-height: 1.25; }
-.brand-sub { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.brand-sub { display: grid; font-size: 12.5px; color: var(--muted); line-height: 1.35; }
 .appbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
 .lang, .status {
   min-height: 34px; border: 1px solid var(--line-strong); background: var(--surface);

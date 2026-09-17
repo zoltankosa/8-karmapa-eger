@@ -148,7 +148,7 @@ export function initShell(page, render, store) {
     document.documentElement.lang = t('htmlLang');
     document.title = `${t('pageTitles')[page]} · ${t('title')}`;
     $('#brandTitle').textContent = t('title');
-    $('#brandSub').textContent = `${t('dates')} · ${t('place')}`;
+    $('#brandSub').replaceChildren(h('span', { text: t('dates') }), h('span', { text: t('place') }));
     const langBtn = $('#langBtn');
     langBtn.textContent = t('switchLang');
     langBtn.setAttribute('aria-label', t('switchLangLabel'));
