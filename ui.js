@@ -124,8 +124,8 @@ export const mine = {
 const PAGES = [
   ['register', './'],
   ['people', 'resztvevok.html'],
-  ['kitchen', 'konyha.html'],
   ['program', 'program.html'],
+  ['kitchen', 'konyha.html'],
 ];
 
 export function initShell(page, render, store) {
