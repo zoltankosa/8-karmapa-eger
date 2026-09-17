@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="8 Karmapa Eger: jelentkezés, konyhai összesítő és program. 2026. szeptember 25-27.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="8 Karmapa Eger">
+  <title>8 Karmapa Eger</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='700' fill='%23f8fafc' text-anchor='middle'%3E8K%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="appbar">
+    <div class="appbar-inner">
+      <div class="brand">
+        <h1 id="title">8 Karmapa Eger</h1>
+        <p id="subtitle" class="muted"></p>
+      </div>
+      <div class="appbar-actions">
+        <button id="statusBtn" class="status" type="button" data-status="syncing"></button>
+        <button id="langBtn" class="lang" type="button">EN</button>
+      </div>
+    </div>
+  </header>
+  <nav id="tabbar" class="tabbar" aria-label="Menu"></nav>
+
+  <div class="container banner-wrap">
+    <p id="demoBanner" class="banner" hidden></p>
+  </div>
+  <main id="view" class="container"></main>
+
+  <button id="fab" class="fab" type="button" hidden></button>
+
+  <dialog id="editor" class="sheet"></dialog>
+  <dialog id="confirm" class="sheet sheet-small"></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p class="container">Az oldal működéséhez JavaScript szükséges. / This page needs JavaScript.</p></noscript>
+</body>
+</html>
