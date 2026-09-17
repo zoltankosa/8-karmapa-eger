@@ -1,7 +1,7 @@
-import { DAYS, ITEMS, normalizePerson, summarize } from './calc.js?v=202609171226';
-import { API_URL } from './config.js?v=202609171226';
-import { createStore } from './store.js?v=202609171226';
-import { $, dayLabel, h, initShell, itemLabel, liveSync, nf, t, toast } from './ui.js?v=202609171226';
+import { DAYS, ITEMS, normalizePerson, summarize } from './calc.js?v=202609171232';
+import { API_URL } from './config.js?v=202609171232';
+import { createStore } from './store.js?v=202609171232';
+import { $, dayLabel, h, initShell, itemLabel, liveSync, nf, t, toast } from './ui.js?v=202609171232';
 
 const store = createStore(API_URL);
 const state = { people: null };

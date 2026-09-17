@@ -1,7 +1,7 @@
-import { normalizePerson, sortPeople } from './calc.js?v=202609171226';
-import { API_URL } from './config.js?v=202609171226';
-import { createStore } from './store.js?v=202609171226';
-import { $, h, icon, initShell, liveSync, mine, t, toast } from './ui.js?v=202609171226';
+import { normalizePerson, sortPeople } from './calc.js?v=202609171232';
+import { API_URL } from './config.js?v=202609171232';
+import { createStore } from './store.js?v=202609171232';
+import { $, h, icon, initShell, liveSync, mine, t, toast } from './ui.js?v=202609171232';
 
 const store = createStore(API_URL);
 const state = { people: null };

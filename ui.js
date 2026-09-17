@@ -1,4 +1,4 @@
-import { STRINGS } from './i18n.js?v=202609171226';
+import { STRINGS } from './i18n.js?v=202609171232';
 
 const KEYS = { lang: 'kbc.lang', mine: 'kbc.mine', cache: 'kbc.cache', outbox: 'kbc.outbox' };
 const POLL_MS = 10000;
@@ -134,7 +134,7 @@ export function initShell(page, render, store) {
     $('#brandTitle').textContent = t('title');
     $('#brandSub').replaceChildren(h('span', { text: t('dates') }), h('span', { text: t('place') }));
     const map = $('#mapLink');
-    map.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t('place'))}&travelmode=driving`;
+    map.href = `https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(t('place'))}&travelmode=driving`;
     map.textContent = t('directions');
     const langBtn = $('#langBtn');
     langBtn.textContent = t('switchLang');
