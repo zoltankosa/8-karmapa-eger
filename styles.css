@@ -87,6 +87,8 @@ a { color: inherit; }
   max-width: 720px; margin: 0 auto; padding: 12px 20px 8px;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
 }
+.brand-wrap { display: grid; min-width: 0; }
+.map-link { justify-self: start; margin-top: 2px; font-size: 12.5px; font-weight: 600; color: var(--focus); text-underline-offset: 2px; }
 .brand { display: grid; min-width: 0; text-decoration: none; }
 .brand-title { font-weight: 750; font-size: 17px; letter-spacing: -0.01em; line-height: 1.25; }
 .brand-sub { display: grid; font-size: 12.5px; color: var(--muted); line-height: 1.35; }
