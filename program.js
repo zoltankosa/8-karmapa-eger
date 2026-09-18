@@ -11,7 +11,7 @@ export const PROGRAM = [
     items: [
       ['8:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
       ['9:00', 'Reggeli', 'Breakfast'],
-      ['', 'Utána 8. Karmapa meditáció', 'Afterwards 8th Karmapa meditation'],
+      ['10:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
       ['12:30', 'Ebéd', 'Lunch'],
       ['14:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
       ['15:00', 'Szünet', 'Break'],
