@@ -1,9 +1,9 @@
-import { DAYS, ITEMS, foldText, normalizePerson, personTotal } from './calc.js?v=202609180859';
-import { API_URL } from './config.js?v=202609180859';
-import { createStore } from './store.js?v=202609180859';
+import { DAYS, ITEMS, foldText, normalizePerson, personTotal } from './calc.js?v=202609180902';
+import { API_URL } from './config.js?v=202609180902';
+import { createStore } from './store.js?v=202609180902';
 import {
   $, cache, confirmDialog, dayLabel, ft, h, icon, initShell, itemLabel, mine, newId, outbox, overlay, t,
-} from './ui.js?v=202609180859';
+} from './ui.js?v=202609180902';
 
 const store = createStore(API_URL);
 const editId = new URLSearchParams(location.search).get('edit') || '';

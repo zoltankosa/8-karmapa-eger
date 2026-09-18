@@ -1,4 +1,4 @@
-import { STRINGS } from './i18n.js?v=202609180859';
+import { STRINGS } from './i18n.js?v=202609180902';
 
 const KEYS = { lang: 'kbc.lang', mine: 'kbc.mine', cache: 'kbc.cache', outbox: 'kbc.outbox' };
 const POLL_MS = 10000;

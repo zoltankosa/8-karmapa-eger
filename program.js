@@ -11,7 +11,6 @@ export const PROGRAM = [
     items: [
       ['8:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
       ['9:00', 'Reggeli', 'Breakfast'],
-      ['10:00', '8. Karmapa meditáció magyarázata', 'Explanation of the 8th Karmapa meditation'],
       ['', 'Utána 8. Karmapa meditáció', 'Afterwards 8th Karmapa meditation'],
       ['12:30', 'Ebéd', 'Lunch'],
       ['14:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
@@ -20,6 +19,7 @@ export const PROGRAM = [
       ['17:00', 'Szünet', 'Break'],
       ['18:00', 'Vacsora', 'Dinner'],
       ['19:00', '16. Karmapa meditáció', '16th Karmapa meditation'],
+      ['20:15', 'Láma Ole Nydahl Mahamudra tanítása felvételről', "Lama Ole Nydahl's Mahamudra teaching from a video"],
     ],
   },
   {
