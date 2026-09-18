@@ -20,7 +20,6 @@ export const PROGRAM = [
       ['17:00', 'Szünet', 'Break'],
       ['18:00', 'Vacsora', 'Dinner'],
       ['19:00', '16. Karmapa meditáció', '16th Karmapa meditation'],
-      ['20:15', 'Láma Ole Nydahl Mahamudra tanítása felvételről', "Lama Ole Nydahl's Mahamudra teaching from a video"],
     ],
   },
   {
