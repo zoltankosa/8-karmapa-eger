@@ -2,8 +2,9 @@ export const PROGRAM = [
   {
     day: 'fri',
     items: [
-      ['18:00', 'Vacsora', 'Dinner'],
-      ['20:15', '8. Karmapa meditáció', '8th Karmapa meditation'],
+      ['19:00', '16. Karmapa meditáció', '16th Karmapa meditation'],
+      ['20:30', '8. Karmapa meditáció', '8th Karmapa meditation'],
+      ['21:30', 'Vacsora', 'Dinner'],
     ],
   },
   {
@@ -24,11 +25,10 @@ export const PROGRAM = [
   {
     day: 'sun',
     items: [
-      ['8:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
-      ['9:00', 'Reggeli', 'Breakfast'],
-      ['10:00', '8. Karmapa meditáció', '8th Karmapa meditation'],
-      ['13:00', 'Ebéd', 'Lunch'],
-      ['15:00', 'Közös takarítás', 'Cleaning the house together'],
+      ['9:00-10:00', 'Meditáció', 'Meditation'],
+      ['10:00-11:30', 'Reggeli (közös)', 'Breakfast (together)'],
+      ['11:30-12:30', 'Meditáció', 'Meditation'],
+      ['12:30', 'Ebéd (közös)', 'Lunch (together)'],
     ],
   },
 ];
